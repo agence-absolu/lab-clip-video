@@ -1,0 +1,210 @@
+// Couleurs
+$cream: #f1e9dc; // papier crème
+$terracotta: #b8452a; // terracotta brûlée
+$ink: #2a211b;
+
+// Typographie
+$font-sans: "Instrument Sans", system-ui, sans-serif;
+$font-serif: "Instrument Serif", serif;
+
+// Largeur de la colonne de texte
+$column: 40rem;
+
+// Titres en Instrument Serif : une seule graisse, et pas de resserrement
+// (le font-stretch du body ne concerne que le texte)
+@mixin serif-title {
+  font-family: $font-serif;
+  font-stretch: normal;
+  font-weight: 400;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+html {
+  // Scrollbar masquée (pas de saut de mise en page quand elle apparaît) :
+  // la progression est indiquée par le tiret .progress
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: $cream;
+  // Texte par défaut : Instrument Sans, la grotesque de la même famille que
+  // le titre, resserrée via son axe de largeur (75 % à 100 %)
+  font-family: $font-sans;
+  font-stretch: 90%;
+}
+
+// La vidéo n'est jamais affichée directement : elle sert de source au canvas
+// du cercle. Pas de display: none, qui peut mettre la lecture en pause.
+// Fixe : elle reste en place pendant le scroll
+mux-background-video {
+  position: fixed;
+  inset: 0;
+  opacity: 0;
+}
+
+mux-background-video,
+img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+// Canvas fixe : il reste en place pendant le scroll
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  // Le cercle reste au-dessus de tout, y compris du contenu, mais laisse passer
+  // les clics et la sélection de texte vers ce qu'il y a dessous
+  &.reveal {
+    z-index: -1;
+    pointer-events: none;
+    user-select: none;
+  }
+}
+
+// Entête plein écran : le titre est positionné dedans et part avec le scroll
+.hero {
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+}
+
+h1 {
+  @include serif-title;
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  // Masqué jusqu'au fade-in GSAP (autoAlpha), pour éviter un flash au chargement
+  visibility: hidden;
+  // font-size calculé en JS pour que le titre occupe toute la largeur
+  font-size: 10vw;
+  line-height: 1;
+  white-space: nowrap;
+  margin: 0;
+  color: $terracotta;
+  // Titre décoratif : non sélectionnable
+  user-select: none;
+}
+
+// Flèche vers le contenu, en bas de l'entête, au-dessus du canvas du cercle.
+// Le bouton est masqué jusqu'à la fin de l'apparition du titre (autoAlpha en
+// JS) ; le conteneur disparaît au scroll
+.scroll-arrow-wrap {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  z-index: 5;
+  translate: -50% 0;
+}
+
+.scroll-arrow {
+  display: block;
+  visibility: hidden;
+  opacity: 0;
+  padding: 0.5rem;
+  border: 0;
+  background: none;
+  color: $terracotta;
+  cursor: pointer;
+
+  svg {
+    display: block;
+  }
+
+  &:focus-visible {
+    outline: 1px solid currentColor;
+    outline-offset: 4px;
+    border-radius: 50%;
+  }
+}
+
+// Contenu sous l'entête : il recouvre la vidéo de fond, sur fond crème
+.content {
+  position: relative;
+  z-index: 3;
+  min-height: 200vh;
+  padding: 6rem 1.5rem;
+  color: $ink;
+  font-size: 1.25rem;
+  line-height: 1.6;
+
+  section {
+    max-width: $column;
+    margin: 0 auto 4rem;
+  }
+
+  h2 {
+    @include serif-title;
+    font-size: 3rem;
+    line-height: 1.1;
+    margin: 0 0 1.5rem;
+    color: $terracotta;
+  }
+
+  p {
+    margin: 0 0 1.25rem;
+  }
+}
+
+// Footer minimaliste : une ligne, deux mentions aux extrémités
+.footer {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: $column;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+  border-top: 1px solid rgba($ink, 0.15);
+  font-size: 0.875rem;
+  color: rgba($ink, 0.6);
+
+  a {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      color: $terracotta;
+    }
+  }
+}
+
+// Tiret de progression : fixe le long du bord droit, déplacé en JS
+.progress {
+  position: fixed;
+  top: 1.5rem;
+  right: 3px;
+  bottom: 1.5rem;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.progress-dash {
+  $width: 1.05rem; // 1.5rem - 30 %
+  width: $width;
+  height: 2px;
+  margin-left: -$width;
+  background-color: $terracotta;
+  // Masqué jusqu'à la fin de l'apparition du titre (autoAlpha en JS)
+  visibility: hidden;
+  opacity: 0;
+}
